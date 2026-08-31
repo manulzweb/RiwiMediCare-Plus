@@ -63,6 +63,19 @@ class RequestService implements IRequestService {
   }
 
   async updateStatus(id: number, dto: UpdateSupplyRequestStatusParams): Promise<SupplyRequest> {
+    const existing = await requestRepository.findById(id);
+    if (!existing) throw new NotFoundError('Request not found');
+
+    // Descuenta inventario solo en la primera transición a APPROVED/DISPATCHED/DELIVERED
+    const shouldDecrement =
+      [RequestStatus.APPROVED, RequestStatus.DISPATCHED, RequestStatus.DELIVERED].includes(
+        dto.status as RequestStatus,
+      ) && existing.status === RequestStatus.PENDING;
+
+    if (shouldDecrement) {
+      await medicineRepository.decrementStock(existing.medicineId, existing.quantity);
+    }
+
     const updated = await requestRepository.updateStatus(id, dto);
     if (!updated) throw new NotFoundError('Request not found');
     return updated;

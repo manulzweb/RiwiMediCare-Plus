@@ -1,6 +1,6 @@
 // app/src/utils/auth.utils.ts
 
-import { AUTH_LIMITS } from '../constant/auth.constant.js';
+import { AUTH_LIMITS } from '../constants/auth.constant.js';
 /**
  * Validates credentials received in an authentication request
  * without exposing or logging sensitive information related to the password.
