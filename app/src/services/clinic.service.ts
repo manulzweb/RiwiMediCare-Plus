@@ -2,7 +2,7 @@ import Clinic from '../models/clinic.model.js';
 import clinicRepository from '../repositories/clinic.repository.js';
 import { CreateClinicParams, UpdateClinicParams } from '../interfaces/clinic.interface.js';
 import { IClinicService } from './interfaces/clinic.service.interface.js';
-import { ValidationError, NotFoundError, ConflictError } from '../errors/domain-errors.js';
+import { ValidationError, NotFoundError } from '../errors/domain-errors.js';
 
 class ClinicService implements IClinicService {
   private validateCreateDto(dto: CreateClinicParams): void {
@@ -14,16 +14,8 @@ class ClinicService implements IClinicService {
     if (!dto.phone?.trim()) throw new ValidationError('Phone is required');
   }
 
-  private async checkDuplicateNit(nit: string, excludeId?: number): Promise<void> {
-    const existing = await clinicRepository.findByNit(nit);
-    if (existing && existing.id !== excludeId) {
-      throw new ConflictError('Clinic with this NIT already exists');
-    }
-  }
-
   async create(dto: CreateClinicParams): Promise<Clinic> {
     this.validateCreateDto(dto);
-    await this.checkDuplicateNit(dto.nit);
     return clinicRepository.create(dto);
   }
 
@@ -39,7 +31,6 @@ class ClinicService implements IClinicService {
 
   async update(id: number, dto: UpdateClinicParams): Promise<Clinic> {
     const clinic = await this.findById(id);
-    if (dto.nit) await this.checkDuplicateNit(dto.nit, id);
     const updated = await clinicRepository.update(clinic.id, dto);
     return updated!;
   }
@@ -50,4 +41,6 @@ class ClinicService implements IClinicService {
   }
 }
 
-export default new ClinicService();
+const clinicService = new ClinicService();
+export { clinicService };
+export default clinicService;

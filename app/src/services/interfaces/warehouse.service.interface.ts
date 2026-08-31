@@ -1,4 +1,8 @@
-import { Warehouse, CreateWarehouseParams, UpdateWarehouseParams } from '../../interfaces/warehouse.interface.js';
+import {
+  Warehouse,
+  CreateWarehouseParams,
+  UpdateWarehouseParams,
+} from '../../interfaces/warehouse.interface.js';
 
 export interface IWarehouseService {
   create(params: CreateWarehouseParams): Promise<Warehouse>;

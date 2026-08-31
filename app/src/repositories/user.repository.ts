@@ -27,7 +27,10 @@ class UserRepository implements IUserRepository {
   }
 
   async updatePassword(id: number, password: string): Promise<void> {
-    const hash = password.startsWith('$2a$') || password.startsWith('$2b$') ? password : await bcrypt.hash(password, envConfig.BCRYPT.ROUNDS);
+    const hash =
+      password.startsWith('$2a$') || password.startsWith('$2b$')
+        ? password
+        : await bcrypt.hash(password, envConfig.BCRYPT.ROUNDS);
     await User.update({ password: hash }, { where: { id } });
   }
 }

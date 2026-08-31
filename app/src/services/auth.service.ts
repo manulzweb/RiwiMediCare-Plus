@@ -4,7 +4,11 @@ import { Transaction, UniqueConstraintError } from 'sequelize';
 
 import { RegisterUserRequestDto } from '../dto/request/register-user.dto.js';
 import { LoginUserRequestDto } from '../dto/request/login-user.dto.js';
-import { IAuthService, LoginUserResult, RegisterUserResult } from './interfaces/auth.service.interface.js';
+import {
+  IAuthService,
+  LoginUserResult,
+  RegisterUserResult,
+} from './interfaces/auth.service.interface.js';
 
 import { isValidPassword } from '../utils/password.util.js';
 import { isValidUserRole, ALLOWED_ROLES } from '../types/user.types.js';
@@ -16,7 +20,11 @@ import userRepository from '../repositories/user.repository.js';
 import passwordService from './password.service.js';
 import tokenService from './auth-token.service.js';
 
-import { EmailAlreadyExistsError, InvalidCredentialsError, AccountNotActivatedError } from '../errors/domain-errors.js';
+import {
+  EmailAlreadyExistsError,
+  InvalidCredentialsError,
+  AccountNotActivatedError,
+} from '../errors/domain-errors.js';
 
 type RegistrationInput = { name: string; email: string; role: UserRole };
 
@@ -54,13 +62,16 @@ class AuthService implements IAuthService {
     if (!password) throw new Error('Password is required');
     if (confirm && password !== confirm) throw new Error('Passwords do not match');
     if (!isValidPassword(password)) {
-      throw new Error('Password must be at least 10 characters and include uppercase, lowercase, number and special character.');
+      throw new Error(
+        'Password must be at least 10 characters and include uppercase, lowercase, number and special character.',
+      );
     }
   }
 
   private validateRole(raw?: unknown): UserRole {
     if (raw === undefined) return DEFAULT_ROLE;
-    if (!isValidUserRole(raw)) throw new Error(`Invalid role. Allowed: ${ALLOWED_ROLES.join(', ')}`);
+    if (!isValidUserRole(raw))
+      throw new Error(`Invalid role. Allowed: ${ALLOWED_ROLES.join(', ')}`);
     return raw as UserRole;
   }
 
@@ -121,7 +132,11 @@ class AuthService implements IAuthService {
     if (user.deletedAt) throw new InvalidCredentialsError();
     const valid = await this.hasher.verify(dto.password, user.password);
     if (!valid) throw new InvalidCredentialsError();
-    const accessToken = this.tokens.generateAccessToken({ id: user.id, email: user.email, role: user.role });
+    const accessToken = this.tokens.generateAccessToken({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
     return { userId: user.id, accessToken };
   }
 }

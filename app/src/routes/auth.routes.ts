@@ -31,7 +31,7 @@ const router = Router();
  *               email:
  *                 type: string
  *                 format: email
- *                 example: user@example.com
+ *                 example: admin@riwi.io
  *               password:
  *                 type: string
  *                 format: password
@@ -65,18 +65,18 @@ router.post('/login', login);
  *               name:
  *                 type: string
  *                 description: User full name
- *                 example: Ana Garcia
+ *                 example: Manuel Vasquez
  *               email:
  *                 type: string
  *                 format: email
- *                 example: ana@riwimedicare.com
+ *                 example: admin@riwi.io
  *               password:
  *                 type: string
  *                 format: password
- *                 example: Secure123!@
+ *                 example: Password123!
  *               confirmPassword:
  *                 type: string
- *                 example: Secure123!@
+ *                 example: Password123!
  *               role:
  *                 type: string
  *                 enum: [ADMIN, REQUEST_MANAGER]

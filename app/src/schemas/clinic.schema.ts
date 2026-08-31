@@ -25,6 +25,13 @@ export const clinicIdParamSchema = z.object({
   id: z.coerce.number().int('ID must be an integer').positive('ID must be positive'),
 });
 
+export const requestClinicIdParamSchema = z.object({
+  clinicId: z.coerce
+    .number()
+    .int('clinicId must be an integer')
+    .positive('clinicId must be positive'),
+});
+
 export type CreateClinicDto = z.infer<typeof createClinicSchema>;
 export type UpdateClinicDto = z.infer<typeof updateClinicSchema>;
 export type ClinicIdParam = z.infer<typeof clinicIdParamSchema>;

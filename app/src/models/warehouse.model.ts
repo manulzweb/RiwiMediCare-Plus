@@ -12,18 +12,24 @@ export interface WarehouseAttributes {
   deletedAt?: Date | null;
 }
 
-export type WarehouseCreationAttributes = Optional<WarehouseAttributes, 'id' | 'isDeleted' | 'createdAt' | 'updatedAt' | 'deletedAt'>;
+export type WarehouseCreationAttributes = Optional<
+  WarehouseAttributes,
+  'id' | 'isDeleted' | 'createdAt' | 'updatedAt' | 'deletedAt'
+>;
 
-export class Warehouse extends Model<WarehouseAttributes, WarehouseCreationAttributes> implements WarehouseAttributes {
-  public id!: number;
-  public name!: string;
-  public code!: string;
-  public location!: string;
-  public isDeleted!: boolean;
+export class Warehouse
+  extends Model<WarehouseAttributes, WarehouseCreationAttributes>
+  implements WarehouseAttributes
+{
+  declare id: number;
+  declare name: string;
+  declare code: string;
+  declare location: string;
+  declare isDeleted: boolean;
 
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
-  public readonly deletedAt!: Date | null;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
+  declare readonly deletedAt: Date | null;
 }
 
 Warehouse.init(

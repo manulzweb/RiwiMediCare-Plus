@@ -3,6 +3,12 @@ import { Router } from 'express';
 import { UserRole } from '../constants/roles.enum.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { roleMiddleware } from '../middleware/role.middleware.js';
+import { validate } from '../middleware/validate.middleware.js';
+import { clinicIdParamSchema, requestClinicIdParamSchema } from '../schemas/clinic.schema.js';
+import { createRequestSchema, updateRequestStatusSchema } from '../schemas/request.schema.js';
+import { checkQuantityMiddleware } from '../middleware/checkQuantity.middleware.js';
+import { checkInventoryMiddleware } from '../middleware/checkInventory.middleware.js';
+import { checkStatusMiddleware } from '../middleware/checkStatus.middleware.js';
 import {
   createRequest,
   getRequests,
@@ -39,8 +45,8 @@ const router = Router();
  *           example: 50
  *         status:
  *           type: string
- *           enum: [pending, approved, rejected, delivered, in_transit]
- *           example: pending
+ *           enum: [PENDING, APPROVED, REJECTED, DISPATCHED, DELIVERED, CANCELLED]
+ *           example: PENDING
  *         notes:
  *           type: string
  *           example: Entrega prioritaria para urgencias
@@ -79,8 +85,9 @@ const router = Router();
  *       properties:
  *         status:
  *           type: string
- *           enum: [pending, approved, rejected, delivered, in_transit]
- *           example: approved
+ *           enum: [PENDING, APPROVED, REJECTED, DISPATCHED, DELIVERED, CANCELLED]
+ *           example: APPROVED
+ *           description: "Case-insensitive — approved/Approved → APPROVED"
  */
 
 /**
@@ -147,7 +154,12 @@ router.get('/active', authMiddleware, getActiveRequests);
  *       404:
  *         description: Clinic not found
  */
-router.get('/clinic/:clinicId', authMiddleware, getRequestsByClinic);
+router.get(
+  '/clinic/:clinicId',
+  authMiddleware,
+  validate(requestClinicIdParamSchema, 'params'),
+  getRequestsByClinic,
+);
 
 /**
  * @swagger
@@ -210,7 +222,7 @@ router.get('/', authMiddleware, getRequests);
  *       404:
  *         description: Request not found
  */
-router.get('/:id', authMiddleware, getRequestById);
+router.get('/:id', authMiddleware, validate(clinicIdParamSchema, 'params'), getRequestById);
 
 /**
  * @swagger
@@ -254,6 +266,9 @@ router.post(
   '/',
   authMiddleware,
   roleMiddleware(UserRole.ADMIN, UserRole.REQUEST_MANAGER),
+  validate(createRequestSchema, 'body'),
+  checkQuantityMiddleware,
+  checkInventoryMiddleware,
   createRequest,
 );
 
@@ -292,6 +307,9 @@ router.patch(
   '/:id/status',
   authMiddleware,
   roleMiddleware(UserRole.ADMIN, UserRole.REQUEST_MANAGER),
+  validate(clinicIdParamSchema, 'params'),
+  validate(updateRequestStatusSchema, 'body'),
+  checkStatusMiddleware,
   updateRequestStatus,
 );
 
@@ -311,7 +329,7 @@ router.patch(
  *           type: integer
  *     responses:
  *       200:
- *         description: Request deleted (logical)
+ *         description: Request deleted
  *       400:
  *         description: Invalid ID
  *       401:
@@ -321,7 +339,12 @@ router.patch(
  *       404:
  *         description: Request not found
  */
-router.delete('/:id', authMiddleware, roleMiddleware(UserRole.ADMIN), deleteRequest);
+router.delete(
+  '/:id',
+  authMiddleware,
+  roleMiddleware(UserRole.ADMIN),
+  validate(clinicIdParamSchema, 'params'),
+  deleteRequest,
+);
 
 export default router;
-

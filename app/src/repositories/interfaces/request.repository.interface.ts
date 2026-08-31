@@ -1,4 +1,8 @@
-import { SupplyRequest, CreateSupplyRequestParams, UpdateSupplyRequestStatusParams } from '../../interfaces/supply-request.interface.js';
+import {
+  SupplyRequest,
+  CreateSupplyRequestParams,
+  UpdateSupplyRequestStatusParams,
+} from '../../interfaces/supply-request.interface.js';
 
 export interface IRequestRepository {
   create(params: CreateSupplyRequestParams): Promise<SupplyRequest>;

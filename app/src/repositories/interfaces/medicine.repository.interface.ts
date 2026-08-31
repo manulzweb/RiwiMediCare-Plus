@@ -1,4 +1,8 @@
-import { Medicine, CreateMedicineParams, UpdateMedicineParams } from '../../interfaces/medicine.interface.js';
+import {
+  Medicine,
+  CreateMedicineParams,
+  UpdateMedicineParams,
+} from '../../interfaces/medicine.interface.js';
 
 export interface IMedicineRepository {
   create(params: CreateMedicineParams): Promise<Medicine>;

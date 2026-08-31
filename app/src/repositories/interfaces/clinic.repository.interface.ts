@@ -1,4 +1,8 @@
-import { Clinic, CreateClinicParams, UpdateClinicParams } from '../../interfaces/clinic.interface.js';
+import {
+  Clinic,
+  CreateClinicParams,
+  UpdateClinicParams,
+} from '../../interfaces/clinic.interface.js';
 
 export interface IClinicRepository {
   create(params: CreateClinicParams): Promise<Clinic>;

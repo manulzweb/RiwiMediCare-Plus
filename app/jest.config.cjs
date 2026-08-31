@@ -1,8 +1,5 @@
-// app/jest.config.ts
-
-import type { Config } from 'jest';
-
-const config: Config = {
+/** @type {import('jest').Config} */
+module.exports = {
   preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
   rootDir: 'src',
@@ -18,6 +15,21 @@ const config: Config = {
   clearMocks: true,
   passWithNoTests: true,
   coverageDirectory: '../coverage',
+  collectCoverageFrom: [
+    'services/**/*.ts',
+    'middleware/**/*.ts',
+    'errors/**/*.ts',
+    'utils/**/*.ts',
+    'constants/**/*.ts',
+    'schemas/**/*.ts',
+    '!**/__tests__/**',
+  ],
+  coverageThreshold: {
+    global: {
+      statements: 40,
+      branches: 25,
+      functions: 40,
+      lines: 40,
+    },
+  },
 };
-
-export default config;

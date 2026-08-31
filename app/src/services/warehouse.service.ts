@@ -38,4 +38,6 @@ class WarehouseService implements IWarehouseService {
   }
 }
 
-export default new WarehouseService();
+const warehouseService = new WarehouseService();
+export { warehouseService };
+export default warehouseService;

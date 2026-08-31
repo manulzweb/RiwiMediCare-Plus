@@ -38,12 +38,9 @@ const sequelize = new Sequelize(envConfig.DB.NAME, envConfig.DB.USER, envConfig.
   },
   define: {
     // Global configuration for RiwiMediCare Plus
-    timestamps: true, // createdAt, updatedAt
-    underscored: true, // snake_case in DB
+    timestamps: true, // createdAt, updatedAt -> DB: created_at, updated_at
+    underscored: true, // snake_case in DB, camelCase in JSON
     paranoid: true, // Soft Delete -> deleted_at, no physical deletion
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
-    deletedAt: 'deleted_at',
   },
   dialectOptions:
     envConfig.NODE_ENV === 'production'

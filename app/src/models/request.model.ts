@@ -22,20 +22,23 @@ export type SupplyRequestCreationAttributes = Optional<
   'id' | 'status' | 'notes' | 'isDeleted' | 'createdAt' | 'updatedAt' | 'deletedAt'
 >;
 
-export class SupplyRequest extends Model<SupplyRequestAttributes, SupplyRequestCreationAttributes> implements SupplyRequestAttributes {
-  public id!: number;
-  public clinicId!: number;
-  public warehouseId!: number;
-  public medicineId!: number;
-  public createdById!: number;
-  public quantity!: number;
-  public status!: RequestStatus;
-  public notes?: string;
-  public isDeleted!: boolean;
+export class SupplyRequest
+  extends Model<SupplyRequestAttributes, SupplyRequestCreationAttributes>
+  implements SupplyRequestAttributes
+{
+  declare id: number;
+  declare clinicId: number;
+  declare warehouseId: number;
+  declare medicineId: number;
+  declare createdById: number;
+  declare quantity: number;
+  declare status: RequestStatus;
+  declare notes?: string;
+  declare isDeleted: boolean;
 
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
-  public readonly deletedAt!: Date | null;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
+  declare readonly deletedAt: Date | null;
 }
 
 SupplyRequest.init(
@@ -48,6 +51,7 @@ SupplyRequest.init(
     clinicId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      field: 'clinic_id',
       references: {
         model: 'clinics',
         key: 'id',
@@ -56,6 +60,7 @@ SupplyRequest.init(
     warehouseId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      field: 'warehouse_id',
       references: {
         model: 'warehouses',
         key: 'id',
@@ -64,6 +69,7 @@ SupplyRequest.init(
     medicineId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      field: 'medicine_id',
       references: {
         model: 'medicines',
         key: 'id',
@@ -72,6 +78,7 @@ SupplyRequest.init(
     createdById: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      field: 'created_by_id',
       references: {
         model: 'users',
         key: 'id',
@@ -97,6 +104,7 @@ SupplyRequest.init(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
+      field: 'is_deleted',
     },
   },
   {

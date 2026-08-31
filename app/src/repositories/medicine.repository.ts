@@ -4,16 +4,26 @@ import { CreateMedicineParams, UpdateMedicineParams } from '../interfaces/medici
 
 class MedicineRepository implements IMedicineRepository {
   async create(data: CreateMedicineParams): Promise<Medicine> {
-    return Medicine.create(data);
+    const medicine = await Medicine.create(data);
+    return (await Medicine.findByPk(medicine.id, {
+      attributes: { exclude: ['warehouseId'] },
+      include: [{ association: 'warehouse' }],
+    })) as Medicine;
   }
   async findByCode(code: string): Promise<Medicine | null> {
     return Medicine.findOne({ where: { code } });
   }
   async findAll(): Promise<Medicine[]> {
-    return Medicine.findAll({ include: ['warehouse'] });
+    return Medicine.findAll({
+      attributes: { exclude: ['warehouseId'] },
+      include: [{ association: 'warehouse' }],
+    });
   }
   async findById(id: number): Promise<Medicine | null> {
-    return Medicine.findByPk(id);
+    return Medicine.findByPk(id, {
+      attributes: { exclude: ['warehouseId'] },
+      include: [{ association: 'warehouse' }],
+    });
   }
   async findByWarehouse(warehouseId: number): Promise<Medicine[]> {
     return Medicine.findAll({ where: { warehouseId } });

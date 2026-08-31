@@ -3,6 +3,8 @@ import { Router } from 'express';
 import { UserRole } from '../constants/roles.enum.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { roleMiddleware } from '../middleware/role.middleware.js';
+import { validate } from '../middleware/validate.middleware.js';
+import { clinicIdParamSchema } from '../schemas/clinic.schema.js';
 import {
   createMedicine,
   getMedicines,
@@ -149,7 +151,7 @@ router.get('/', authMiddleware, getMedicines);
  *       404:
  *         description: Medicine not found
  */
-router.get('/:id', authMiddleware, getMedicineById);
+router.get('/:id', authMiddleware, validate(clinicIdParamSchema, 'params'), getMedicineById);
 
 /**
  * @swagger
@@ -223,7 +225,13 @@ router.post('/', authMiddleware, roleMiddleware(UserRole.ADMIN), createMedicine)
  *       404:
  *         description: Medicine not found
  */
-router.put('/:id', authMiddleware, roleMiddleware(UserRole.ADMIN), updateMedicine);
+router.put(
+  '/:id',
+  authMiddleware,
+  roleMiddleware(UserRole.ADMIN),
+  validate(clinicIdParamSchema, 'params'),
+  updateMedicine,
+);
 
 /**
  * @swagger
@@ -241,7 +249,7 @@ router.put('/:id', authMiddleware, roleMiddleware(UserRole.ADMIN), updateMedicin
  *           type: integer
  *     responses:
  *       200:
- *         description: Medicine deleted (logical)
+ *         description: Medicine deleted
  *       400:
  *         description: Invalid ID
  *       401:
@@ -251,7 +259,12 @@ router.put('/:id', authMiddleware, roleMiddleware(UserRole.ADMIN), updateMedicin
  *       404:
  *         description: Medicine not found
  */
-router.delete('/:id', authMiddleware, roleMiddleware(UserRole.ADMIN), deleteMedicine);
+router.delete(
+  '/:id',
+  authMiddleware,
+  roleMiddleware(UserRole.ADMIN),
+  validate(clinicIdParamSchema, 'params'),
+  deleteMedicine,
+);
 
 export default router;
-

@@ -1,9 +1,6 @@
 // app/src/routes/seed.routes.ts
 import { Router } from 'express';
-import { UserRole } from '../constants/roles.enum.js';
 import multer from 'multer';
-import { authMiddleware } from '../middleware/auth.middleware.js';
-import { roleMiddleware } from '../middleware/role.middleware.js';
 import seedService from '../services/seed.service.js';
 
 const router = Router();
@@ -20,9 +17,9 @@ const upload = multer({
  * @swagger
  * /api/v1/seed/upload:
  *   post:
- *     summary: Seed database from JSON file (ADMIN only)
+ *     summary: Seed database from JSON file (no auth)
+ *     description: Carga inicial sin JWT — útil para primer deploy. Acepta JSON con users, warehouses, clinics, medicines.
  *     tags: [Seed]
- *     security: [{ bearerAuth: [] }]
  *     requestBody:
  *       required: true
  *       content:
@@ -32,9 +29,12 @@ const upload = multer({
  *       200: { description: Seeded successfully }
  *       400: { description: Invalid file }
  */
-router.post('/upload', authMiddleware, roleMiddleware(UserRole.ADMIN), upload.single('file'), async (req, res) => {
+router.post('/upload', upload.single('file'), async (req, res) => {
   try {
-    if (!req.file) { res.status(400).json({ success: false, message: 'File is required (field name: file)' }); return; }
+    if (!req.file) {
+      res.status(400).json({ success: false, message: 'File is required (field name: file)' });
+      return;
+    }
     const result = await seedService.seedFromBuffer(req.file.buffer);
     res.json({ success: true, message: 'Seed completed', data: result });
   } catch (e) {

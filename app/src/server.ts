@@ -15,20 +15,7 @@ const app = express();
 
 app.use(helmet());
 app.use(express.json());
-
-// Simple cookie parser (no extra dependency)
-app.use((req, _res, next) => {
-  const cookieHeader = req.headers.cookie;
-  const parsed: Record<string, string> = {};
-  if (cookieHeader) {
-    cookieHeader.split(';').forEach((c) => {
-      const [k, ...v] = c.trim().split('=');
-      parsed[k] = decodeURIComponent(v.join('='));
-    });
-  }
-  req.cookies = parsed;
-  next();
-});
+app.use(express.urlencoded({ extended: true }));
 
 app.use(
   rateLimit({

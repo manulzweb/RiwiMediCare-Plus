@@ -12,32 +12,6 @@ const required = (name: string): string => {
   return value;
 };
 
-const parseExpiresToMs = (value: string): number => {
-  const match = /^(\d+)([smhd])$/.exec(value.trim());
-
-  if (!match) {
-    throw new Error(
-      `Invalid expiration format: "${value}". Use a number followed by s, m, h, or d (e.g., "7d", "15m").`,
-    );
-  }
-
-  const amount = Number(match[1]);
-  const unit = match[2];
-
-  const multipliers: Record<string, number> = {
-    s: 1000,
-    m: 60 * 1000,
-    h: 60 * 60 * 1000,
-    d: 24 * 60 * 60 * 1000,
-  };
-
-  return amount * multipliers[unit];
-};
-
-const isTruthy = (value: string | undefined): boolean => {
-  return value === 'true';
-};
-
 export const envConfig = {
   PORT: Number(process.env.APP_PORT ?? 3000),
 
@@ -67,10 +41,6 @@ export const envConfig = {
   BCRYPT: {
     ROUNDS: Number(process.env.BCRYPT_ROUNDS ?? 12),
   },
-  LOGIN: {
-    MAX_ATTEMPTS: Number(process.env.MAX_LOGIN_ATTEMPTS ?? 5),
-    LOCK_TIME_MINUTES: Number(process.env.LOCK_TIME_MINUTES ?? 15),
-  },
 
   RATE_LIMIT: {
     WINDOW_MS: Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60000),
@@ -83,26 +53,5 @@ export const envConfig = {
     MESSAGE:
       process.env.REGISTER_LIMIT_MESSAGE ??
       'Too many registration requests. Please try again later.',
-    ACTIVATION_TOKEN_EXPIRE_HOURS: Number(process.env.ACTIVATION_TOKEN_EXPIRE_HOURS ?? 24),
-  },
-
-  SMTP: {
-    HOST: process.env.SMTP_HOST ?? '',
-    PORT: Number(process.env.SMTP_PORT ?? 2525),
-    SECURE: process.env.SMTP_SECURE === 'true',
-    USER: process.env.SMTP_USER ?? '',
-    PASS: process.env.SMTP_PASS ?? '',
-    FROM: process.env.SMTP_FROM ?? 'no-reply@example.com',
-  },
-
-  COOKIE: {
-    MAXAGE: parseExpiresToMs(process.env.JWT_REFRESH_EXPIRES_IN ?? '7d'),
-  },
-  RECAPTCHA: {
-    ENABLED: process.env.NODE_ENV !== 'test' && isTruthy(process.env.RECAPTCHA_ENABLED),
-    SITE_KEY: process.env.RECAPTCHA_SITE_KEY ?? '',
-    SECRET_KEY: process.env.RECAPTCHA_SECRET_KEY ?? '',
-    TIMEOUT_MS: Number(process.env.RECAPTCHA_TIMEOUT_MS ?? 5000),
-    VERIFY_URL: 'https://www.google.com/recaptcha/api/siteverify',
   },
 };

@@ -15,21 +15,27 @@ export interface MedicineAttributes {
   deletedAt?: Date | null;
 }
 
-export type MedicineCreationAttributes = Optional<MedicineAttributes, 'id' | 'description' | 'isDeleted' | 'createdAt' | 'updatedAt' | 'deletedAt'>;
+export type MedicineCreationAttributes = Optional<
+  MedicineAttributes,
+  'id' | 'description' | 'isDeleted' | 'createdAt' | 'updatedAt' | 'deletedAt'
+>;
 
-export class Medicine extends Model<MedicineAttributes, MedicineCreationAttributes> implements MedicineAttributes {
-  public id!: number;
-  public warehouseId!: number;
-  public name!: string;
-  public code!: string;
-  public description?: string;
-  public stock!: number;
-  public unitPrice!: number;
-  public isDeleted!: boolean;
+export class Medicine
+  extends Model<MedicineAttributes, MedicineCreationAttributes>
+  implements MedicineAttributes
+{
+  declare id: number;
+  declare warehouseId: number;
+  declare name: string;
+  declare code: string;
+  declare description?: string;
+  declare stock: number;
+  declare unitPrice: number;
+  declare isDeleted: boolean;
 
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
-  public readonly deletedAt!: Date | null;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
+  declare readonly deletedAt: Date | null;
 }
 
 Medicine.init(
@@ -42,6 +48,7 @@ Medicine.init(
     warehouseId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      field: 'warehouse_id',
       references: {
         model: 'warehouses',
         key: 'id',
@@ -54,7 +61,6 @@ Medicine.init(
     code: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      unique: true,
     },
     description: {
       type: DataTypes.TEXT,

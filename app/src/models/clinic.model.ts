@@ -15,21 +15,27 @@ export interface ClinicAttributes {
   deletedAt?: Date | null;
 }
 
-export type ClinicCreationAttributes = Optional<ClinicAttributes, 'id' | 'isDeleted' | 'createdAt' | 'updatedAt' | 'deletedAt'>;
+export type ClinicCreationAttributes = Optional<
+  ClinicAttributes,
+  'id' | 'isDeleted' | 'createdAt' | 'updatedAt' | 'deletedAt'
+>;
 
-export class Clinic extends Model<ClinicAttributes, ClinicCreationAttributes> implements ClinicAttributes {
-  public id!: number;
-  public name!: string;
-  public nit!: string;
-  public address!: string;
-  public phone!: string;
-  public responsibleName!: string;
-  public responsibleEmail!: string;
-  public isDeleted!: boolean;
+export class Clinic
+  extends Model<ClinicAttributes, ClinicCreationAttributes>
+  implements ClinicAttributes
+{
+  declare id: number;
+  declare name: string;
+  declare nit: string;
+  declare address: string;
+  declare phone: string;
+  declare responsibleName: string;
+  declare responsibleEmail: string;
+  declare isDeleted: boolean;
 
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
-  public readonly deletedAt!: Date | null;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
+  declare readonly deletedAt: Date | null;
 }
 
 Clinic.init(

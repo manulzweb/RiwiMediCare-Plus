@@ -3,6 +3,8 @@ import { Router } from 'express';
 import { UserRole } from '../constants/roles.enum.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { roleMiddleware } from '../middleware/role.middleware.js';
+import { validate } from '../middleware/validate.middleware.js';
+import { clinicIdParamSchema } from '../schemas/clinic.schema.js';
 import {
   createWarehouse,
   getWarehouses,
@@ -127,7 +129,7 @@ router.get('/', authMiddleware, getWarehouses);
  *       404:
  *         description: Warehouse not found
  */
-router.get('/:id', authMiddleware, getWarehouseById);
+router.get('/:id', authMiddleware, validate(clinicIdParamSchema, 'params'), getWarehouseById);
 
 /**
  * @swagger
@@ -198,7 +200,13 @@ router.post('/', authMiddleware, roleMiddleware(UserRole.ADMIN), createWarehouse
  *       404:
  *         description: Warehouse not found
  */
-router.put('/:id', authMiddleware, roleMiddleware(UserRole.ADMIN), updateWarehouse);
+router.put(
+  '/:id',
+  authMiddleware,
+  roleMiddleware(UserRole.ADMIN),
+  validate(clinicIdParamSchema, 'params'),
+  updateWarehouse,
+);
 
 /**
  * @swagger
@@ -216,7 +224,7 @@ router.put('/:id', authMiddleware, roleMiddleware(UserRole.ADMIN), updateWarehou
  *           type: integer
  *     responses:
  *       200:
- *         description: Warehouse deleted (logical)
+ *         description: Warehouse deleted 
  *       400:
  *         description: Invalid ID
  *       401:
@@ -226,7 +234,12 @@ router.put('/:id', authMiddleware, roleMiddleware(UserRole.ADMIN), updateWarehou
  *       404:
  *         description: Warehouse not found
  */
-router.delete('/:id', authMiddleware, roleMiddleware(UserRole.ADMIN), deleteWarehouse);
+router.delete(
+  '/:id',
+  authMiddleware,
+  roleMiddleware(UserRole.ADMIN),
+  validate(clinicIdParamSchema, 'params'),
+  deleteWarehouse,
+);
 
 export default router;
-

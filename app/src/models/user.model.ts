@@ -14,19 +14,22 @@ export interface UserAttributes {
   deletedAt?: Date | null;
 }
 
-export type UserCreationAttributes = Optional<UserAttributes, 'id' | 'isDeleted' | 'createdAt' | 'updatedAt' | 'deletedAt'>;
+export type UserCreationAttributes = Optional<
+  UserAttributes,
+  'id' | 'isDeleted' | 'createdAt' | 'updatedAt' | 'deletedAt'
+>;
 
 export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-  public id!: number;
-  public name!: string;
-  public email!: string;
-  public password!: string;
-  public role!: UserRole;
-  public isDeleted!: boolean;
+  declare id: number;
+  declare name: string;
+  declare email: string;
+  declare password: string;
+  declare role: UserRole;
+  declare isDeleted: boolean;
 
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
-  public readonly deletedAt!: Date | null;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
+  declare readonly deletedAt: Date | null;
 }
 
 User.init(

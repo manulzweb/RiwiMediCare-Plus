@@ -1,61 +1,73 @@
+// src/controllers/request.controller.ts
 import { Request, Response } from 'express';
-import requestService from '../services/request.service.js';
-
-const handleError = (res: Response, error: unknown) => {
-  const status = (error as { statusCode?: number }).statusCode || 500;
-  const message = error instanceof Error ? error.message : 'Internal server error';
-  if (status === 500) console.error(error);
-  return res.status(status).json({ success: status < 400, message });
-};
+import { requestService } from '../services/request.service.js';
+import { handleHttpError } from '../utils/http-error.util.js';
 
 export const createRequest = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = (req.user as unknown as { id?: number })?.id ?? null;
+    // req.user es inyectado por authMiddleware; id proviene del JWT.
+    const userId = (req.user as unknown as { id: number }).id;
     const data = await requestService.create({ ...req.body, createdById: userId });
     res.status(201).json({ success: true, message: 'Request created', data });
-  } catch (e) { handleError(res, e); }
+  } catch (error) {
+    handleHttpError(res, error);
+  }
 };
 
 export const getRequests = async (_req: Request, res: Response): Promise<void> => {
-  try { const data = await requestService.findAll(); res.json({ success: true, data }); } catch (e) { handleError(res, e); }
+  try {
+    const data = await requestService.findAll();
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    handleHttpError(res, error);
+  }
 };
 
 export const getActiveRequests = async (_req: Request, res: Response): Promise<void> => {
-  try { const data = await requestService.findActive(); res.json({ success: true, data }); } catch (e) { handleError(res, e); }
+  try {
+    const data = await requestService.findActive();
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    handleHttpError(res, error);
+  }
 };
 
 export const getRequestsByClinic = async (req: Request, res: Response): Promise<void> => {
   try {
-    const clinicId = Number(req.params.clinicId);
-    if (Number.isNaN(clinicId)) { res.status(400).json({ success: false, message: 'Invalid clinicId' }); return; }
-    const data = await requestService.findByClinic(clinicId);
-    res.json({ success: true, data });
-  } catch (e) { handleError(res, e); }
+    // Zod Validation Middleware ya garantizó que req.params.clinicId es un number.
+    const data = await requestService.findByClinic(req.params.clinicId as unknown as number);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    handleHttpError(res, error);
+  }
 };
 
 export const getRequestById = async (req: Request, res: Response): Promise<void> => {
   try {
-    const id = Number(req.params.id);
-    if (Number.isNaN(id)) { res.status(400).json({ success: false, message: 'Invalid id' }); return; }
-    const data = await requestService.findById(id);
-    res.json({ success: true, data });
-  } catch (e) { handleError(res, e); }
+    // Zod Validation Middleware ya garantizó que req.params.id es un number.
+    const data = await requestService.findById(req.params.id as unknown as number);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    handleHttpError(res, error);
+  }
 };
 
 export const updateRequestStatus = async (req: Request, res: Response): Promise<void> => {
   try {
-    const id = Number(req.params.id);
-    if (Number.isNaN(id)) { res.status(400).json({ success: false, message: 'Invalid id' }); return; }
-    const data = await requestService.updateStatus(id, req.body);
-    res.json({ success: true, message: 'Status updated', data });
-  } catch (e) { handleError(res, e); }
+    // Zod Validation Middleware ya garantizó que req.params.id es un number.
+    const data = await requestService.updateStatus(req.params.id as unknown as number, req.body);
+    res.status(200).json({ success: true, message: 'Status updated', data });
+  } catch (error) {
+    handleHttpError(res, error);
+  }
 };
 
 export const deleteRequest = async (req: Request, res: Response): Promise<void> => {
   try {
-    const id = Number(req.params.id);
-    if (Number.isNaN(id)) { res.status(400).json({ success: false, message: 'Invalid id' }); return; }
-    await requestService.delete(id);
-    res.json({ success: true, message: 'Request deleted (logical)' });
-  } catch (e) { handleError(res, e); }
+    // Zod Validation Middleware ya garantizó que req.params.id es un number.
+    await requestService.delete(req.params.id as unknown as number);
+    res.status(200).json({ success: true, message: 'Request deleted ' });
+  } catch (error) {
+    handleHttpError(res, error);
+  }
 };

@@ -16,6 +16,7 @@ import {
   updateClinic,
   deleteClinic,
 } from '../controllers/clinic.controller.js';
+import { checkDuplicateNitMiddleware } from '../middleware/checkNit.middleware.js';
 
 const router = Router();
 
@@ -38,22 +39,37 @@ const router = Router();
  *     ClinicInput:
  *       type: object
  *       required: [name, nit, address, phone, responsibleName, responsibleEmail]
+ *       example:
+ *         name: "Clínica Norte"
+ *         nit: "900123456-10"
+ *         address: "Carrera 15 # 85-20, Bogotá"
+ *         phone: "+57 301 4567890"
+ *         responsibleName: "Laura Méndez"
+ *         responsibleEmail: "laura.mendez@clinic.com"
  *       properties:
- *         name: { type: string, example: "Clínica Central" }
- *         nit: { type: string, example: "900123456-1" }
- *         address: { type: string, example: "Calle 10 # 20-30" }
- *         phone: { type: string, example: "+57 3001234567" }
- *         responsibleName: { type: string, example: "Ana García" }
- *         responsibleEmail: { type: string, format: email, example: "ana@clinic.com" }
+ *         name: { type: string, example: "Clínica Norte" }
+ *         nit: { type: string, example: "900123456-10" }
+ *         address: { type: string, example: "Carrera 15 # 85-20, Bogotá" }
+ *         phone: { type: string, example: "+57 301 4567890" }
+ *         responsibleName: { type: string, example: "Laura Méndez" }
+ *         responsibleEmail: { type: string, format: email, example: "laura.mendez@clinic.com" }
  *     ClinicUpdateInput:
  *       type: object
+ *       description: "Todos los campos opcionales — envía solo lo que quieres cambiar. NIT único validado por middleware (409 si ya existe en otra clínica)."
+ *       example:
+ *         name: "Clínica Norte Actualizada"
+ *         nit: "900123456-11"
+ *         address: "Calle 15 # 30-45, Medellín"
+ *         phone: "+57 3019876543"
+ *         responsibleName: "Carlos Pérez"
+ *         responsibleEmail: "carlos.perez@clinic.com"
  *       properties:
- *         name: { type: string }
- *         nit: { type: string }
- *         address: { type: string }
- *         phone: { type: string }
- *         responsibleName: { type: string }
- *         responsibleEmail: { type: string, format: email }
+ *         name: { type: string, example: "Clínica Norte Actualizada" }
+ *         nit: { type: string, example: "900123456-11" }
+ *         address: { type: string, example: "Calle 15 # 30-45, Medellín" }
+ *         phone: { type: string, example: "+57 3019876543" }
+ *         responsibleName: { type: string, example: "Carlos Pérez" }
+ *         responsibleEmail: { type: string, format: email, example: "carlos.perez@clinic.com" }
  */
 
 /**
@@ -141,8 +157,8 @@ router.get(
  * @swagger
  * /api/v1/clinics:
  *   post:
- *     summary: Create clinic (ADMIN only)
- *     description: Chain — Auth(401) → RoleGuard(403) → Zod body(400) → Service NIT unique(409) → Controller(201)
+ *     summary: Create clinic (ADMIN only) — prueba con NIT 900123456-10
+ *     description: Chain — Auth(401) → RoleGuard(403) → Zod body(400) → checkDuplicateNitMiddleware(409) → Controller(201). **Tip:** El ejemplo ya trae NIT libre `900123456-10` (DB tiene `900123456-1` y `900123356-1`). Si ves `409`, cambia el NIT a otro `90012345X-X`.
  *     tags: [Clinics]
  *     security:
  *       - bearerAuth: []
@@ -180,6 +196,7 @@ router.post(
   authMiddleware,
   roleMiddleware(UserRole.ADMIN),
   validate(createClinicSchema, 'body'),
+  checkDuplicateNitMiddleware,
   createClinic,
 );
 
@@ -187,8 +204,8 @@ router.post(
  * @swagger
  * /api/v1/clinics/{id}:
  *   put:
- *     summary: Update clinic (ADMIN only)
- *     description: Chain — Auth(401) → RoleGuard(403) → Validate params(400) → Zod body(400) → Service NIT unique(409) → Controller(200)
+ *     summary: Update clinic (ADMIN only) — envía solo 1 campo si quieres
+ *     description: Chain — Auth(401) → RoleGuard(403) → Validate params(400) → Zod body(400) → checkDuplicateNitMiddleware(409) → Controller(200). **Tip:** Puedes enviar solo `{"name":"Nuevo nombre"}`. Si cambias NIT usa uno libre `900123456-11` (no `900123456-1` que ya existe).
  *     tags: [Clinics]
  *     security:
  *       - bearerAuth: []
@@ -225,6 +242,7 @@ router.put(
   roleMiddleware(UserRole.ADMIN),
   validate(clinicIdParamSchema, 'params'),
   validate(updateClinicSchema, 'body'),
+  checkDuplicateNitMiddleware,
   updateClinic,
 );
 
@@ -246,7 +264,7 @@ router.put(
  *           minimum: 1
  *     responses:
  *       200:
- *         description: Clinic deleted (logical)
+ *         description: Clinic deleted
  *       400:
  *         description: Invalid id
  *       401:

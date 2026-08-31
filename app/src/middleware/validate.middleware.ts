@@ -1,6 +1,6 @@
 // app/src/middleware/validate.middleware.ts
 import type { Request, Response, NextFunction } from 'express';
-import type { ZodSchema } from 'zod';
+import { z } from 'zod';
 
 export type ValidationSource = 'body' | 'params' | 'query';
 
@@ -10,7 +10,7 @@ export type ValidationSource = 'body' | 'params' | 'query';
  * Ubicación: `src/middleware` (pipeline HTTP), no `utils` (tiene efecto `res`).
  */
 export const validate =
-  (schema: ZodSchema, source: ValidationSource = 'body') =>
+  (schema: z.ZodType, source: ValidationSource = 'body') =>
   (req: Request, res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req[source]);
 
@@ -18,7 +18,7 @@ export const validate =
       res.status(400).json({
         success: false,
         message: 'Validation failed',
-        details: result.error.flatten(),
+        details: z.flattenError(result.error),
       });
       return;
     }

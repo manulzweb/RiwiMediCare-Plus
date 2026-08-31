@@ -1,0 +1,86 @@
+{
+  "users": [
+    {
+      "name": "Admin RiwiMediCare",
+      "email": "admin@riwimedicare.com",
+      "password": "Admin123!@",
+      "role": "ADMIN"
+    },
+    {
+      "name": "Gestor Solicitudes",
+      "email": "gestor@riwimedicare.com",
+      "password": "Gestor123!@",
+      "role": "REQUEST_MANAGER"
+    },
+    {
+      "name": "Ana García",
+      "email": "ana@riwimedicare.com",
+      "password": "Secure123!@",
+      "role": "ADMIN"
+    }
+  ],
+  "warehouses": [
+    { "name": "Bodega Central", "code": "BOG-001", "location": "Bogotá D.C. - Fontibón, Calle 17 # 69-02" },
+    { "name": "Bodega Norte", "code": "BOG-002", "location": "Bogotá - Suba, Carrera 55 # 152-20" }
+  ],
+  "clinics": [
+    {
+      "name": "Clínica Central",
+      "nit": "900123456-10",
+      "address": "Carrera 15 # 85-20, Bogotá",
+      "phone": "+57 300 4567890",
+      "responsibleName": "Laura Méndez",
+      "responsibleEmail": "laura.mendez@clinic.com"
+    },
+    {
+      "name": "Clínica Norte",
+      "nit": "900123456-11",
+      "address": "Calle 45 # 20-30, Medellín",
+      "phone": "+57 301 9876543",
+      "responsibleName": "Carlos Pérez",
+      "responsibleEmail": "carlos.perez@clinic.com"
+    },
+    {
+      "name": "Clínica Sur",
+      "nit": "900123456-12",
+      "address": "Av. 30 # 10-15, Cali",
+      "phone": "+57 302 3456789",
+      "responsibleName": "María Gómez",
+      "responsibleEmail": "maria.gomez@clinic.com"
+    }
+  ],
+  "medicines": [
+    {
+      "name": "Paracetamol 500mg",
+      "code": "MED-001",
+      "description": "Analgésico y antipirético",
+      "stock": 120,
+      "unitPrice": 2500.5,
+      "warehouseId": 1
+    },
+    {
+      "name": "Ibuprofeno 400mg",
+      "code": "MED-002",
+      "description": "Antiinflamatorio no esteroideo",
+      "stock": 80,
+      "unitPrice": 3200,
+      "warehouseId": 1
+    },
+    {
+      "name": "Amoxicilina 500mg",
+      "code": "MED-003",
+      "description": "Antibiótico de amplio espectro",
+      "stock": 60,
+      "unitPrice": 5500,
+      "warehouseId": 2
+    },
+    {
+      "name": "Omeprazol 20mg",
+      "code": "MED-004",
+      "description": "Inhibidor de bomba de protones",
+      "stock": 90,
+      "unitPrice": 4200,
+      "warehouseId": 2
+    }
+  ]
+}

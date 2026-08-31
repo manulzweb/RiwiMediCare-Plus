@@ -10,7 +10,8 @@ class MedicineService implements IMedicineService {
     if (!dto.name?.trim()) throw new ValidationError('Name is required');
     if (!dto.code?.trim()) throw new ValidationError('Code is required');
     if (dto.stock === undefined || dto.stock < 0) throw new ValidationError('Stock must be >= 0');
-    if (dto.unitPrice === undefined || dto.unitPrice < 0) throw new ValidationError('Unit price must be >= 0');
+    if (dto.unitPrice === undefined || dto.unitPrice < 0)
+      throw new ValidationError('Unit price must be >= 0');
     if (!dto.warehouseId) throw new ValidationError('warehouseId is required');
   }
 
@@ -48,4 +49,6 @@ class MedicineService implements IMedicineService {
   }
 }
 
-export default new MedicineService();
+const medicineService = new MedicineService();
+export { medicineService };
+export default medicineService;
