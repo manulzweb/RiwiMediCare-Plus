@@ -13,4 +13,4 @@ RUN npm install
 EXPOSE 3000
 
 # Comando por defecto (ESM)
-CMD ["npx", "ts-node-dev", "--respawn", "--transpile-only", "--esm", "src/index.ts"]
+CMD ["npm", "run", "dev"]
