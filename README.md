@@ -1,22 +1,23 @@
 # RiwiMediCare Plus — Prueba de Desempeño Módulo 5.2 Node.js
 
-**Coder:** [Tu Nombre] — **Clan:** [Tu Clan] — **Be a codernnn**
+**Coder:** [Tu Nombre Completo] — **Clan:** [Tu Clan - Ej: Clan Gates] — **Be a codernnn**
+**Repositorio:** `https://github.com/<tu-usuario>/RiwiMediCare-Plus` (público, ramas `main`/`develop`/`feature/*`, Conventional Commits)
 
 API REST para gestión del ciclo de vida de solicitudes de abastecimiento de medicamentos (Clínicas, Almacenes, Medicamentos, Solicitudes) — distribución de insumos médicos.
 
 ## Stack
 
-| Capa | Tecnología |
-|------|------------|
-| Runtime | Node.js 18+ (ESM `type:module`) |
-| Framework | Express 5 |
-| Lenguaje | TypeScript strict (`strict:true`, no `any`) |
-| DB | PostgreSQL 15 + Sequelize 6 (`paranoid:true`, `underscored:true`) |
-| Auth | JWT HS256 `HS256` payload `{id,email,role}`, bcryptjs (hooks `beforeCreate/beforeUpdate`) |
-| Docs | Swagger `swagger-jsdoc` + `swagger-ui-express` en `/api/docs` |
-| Upload | Multer `memoryStorage` (JSON seeder) |
-| Infra | Docker 20-alpine + Compose, volumen `db_data`, red `backend` |
-| Tests | Jest `ts-jest` ESM (`preset: default-esm`) |
+| Capa      | Tecnología                                                                                |
+| --------- | ----------------------------------------------------------------------------------------- |
+| Runtime   | Node.js 18+ (ESM `type:module`)                                                           |
+| Framework | Express 5                                                                                 |
+| Lenguaje  | TypeScript strict (`strict:true`, no `any`)                                               |
+| DB        | PostgreSQL 15 + Sequelize 6 (`paranoid:true`, `underscored:true`)                         |
+| Auth      | JWT HS256 `HS256` payload `{id,email,role}`, bcryptjs (hooks `beforeCreate/beforeUpdate`) |
+| Docs      | Swagger `swagger-jsdoc` + `swagger-ui-express` en `/api/docs`                             |
+| Upload    | Multer `memoryStorage` (JSON seeder)                                                      |
+| Infra     | Docker 20-alpine + Compose, volumen `db_data`, red `backend`                              |
+| Tests     | Jest `ts-jest` ESM (`preset: default-esm`)                                                |
 
 ## Estructura
 
@@ -90,59 +91,116 @@ npm test         # jest --passWithNoTests
 npm run test:coverage
 ```
 
-## Seeders (Multer JSON)
+## Seeders (Multer JSON) — `POST /api/v1/seed/upload` (sin JWT, carga inicial)
 
-Endpoint protegido `Administrador` que actúa como seeder dinámico:
+Endpoint **sin autenticación** (útil para primer deploy). Multer `memoryStorage`, `fileFilter` solo `.json`, `5MB` max, transacción `sequelize.transaction` orden `warehouses → clinics → medicines` + hash `bcrypt` para usuarios.
 
-```bash
-# JSON ejemplo: seed.json
+**Archivo real incluido:** `app/seed-real.json` (3 users, 3 clinics, 2 warehouses, 4 medicines — datos reales probados)
+
+```json
 {
-  "users": [{ "name": "Ana", "email": "ana@test.com", "password": "Secure123!@", "role": "Administrador" }],
-  "clinics": [{ "name": "Clínica Central", "nit": "900123456-1", "responsibleName": "Dr. Pérez", "address": "Cra 10 #20-30" }],
-  "warehouses": [{ "name": "Bodega Norte", "location": "Bogotá" }],
-  "medicines": [{ "name": "Paracetamol", "code": "MED001", "stock": 100, "warehouseId": 1 }]
+  "users": [
+    {
+      "name": "Admin RiwiMediCare",
+      "email": "admin@riwimedicare.com",
+      "password": "Admin123!@",
+      "role": "ADMIN"
+    },
+    {
+      "name": "Gestor Solicitudes",
+      "email": "gestor@riwimedicare.com",
+      "password": "Gestor123!@",
+      "role": "REQUEST_MANAGER"
+    }
+  ],
+  "warehouses": [
+    {
+      "name": "Bodega Central",
+      "code": "BOG-001",
+      "location": "Bogotá D.C. - Fontibón, Calle 17 # 69-02"
+    },
+    {
+      "name": "Bodega Norte",
+      "code": "BOG-002",
+      "location": "Bogotá - Suba, Carrera 55 # 152-20"
+    }
+  ],
+  "clinics": [
+    {
+      "name": "Clínica Central",
+      "nit": "900123456-10",
+      "address": "Carrera 15 #85-20, Bogotá",
+      "phone": "+57 300 4567890",
+      "responsibleName": "Laura Méndez",
+      "responsibleEmail": "laura.mendez@clinic.com"
+    }
+  ],
+  "medicines": [
+    {
+      "name": "Paracetamol 500mg",
+      "code": "MED-001",
+      "description": "Analgésico",
+      "stock": 120,
+      "unitPrice": 2500.5,
+      "warehouseId": 1
+    }
+  ]
 }
-
-# Cargar
-curl -X POST http://localhost:3000/api/v1/seed/upload \
-  -H "Authorization: Bearer <JWT Administrador>" \
-  -F "file=@seed.json"
-
-# Respuesta: { success:true, data:{ users:1, clinics:1, warehouses:1, medicines:1 } }
 ```
 
-Multer `memoryStorage`, `fileFilter` solo `.json`, `5MB` max, transacción `sequelize.transaction` para crear Users (hash vía hook), Clinics, Warehouses, Medicines.
+```bash
+# Sin JWT (actual)
+curl -X POST http://localhost:3000/api/v1/seed/upload -F file=@app/seed-real.json
+# Respuesta: { success:true, message:"Seed completed", data:{users:3, clinics:3, warehouses:2, medicines:4} }
 
-## Autenticación y Roles
+# Swagger: POST /api/v1/seed/upload → Choose File → seed-real.json → Execute
+```
 
-- `POST /api/v1/auth/register` **sin JWT** — body `name, email, password, confirmPassword, role (Administrador|Gestor de Solicitudes)` — valida campos y formato email, `409` si NIT/email duplicado.
-- `POST /api/v1/auth/login` — retorna `200 { accessToken }` con payload `{id,email,role}`.
-- `authMiddleware` verifica `Authorization: Bearer <token>`; `roleMiddleware(...roles)` restringe. `Administrador` = CRUD completo clínicas/almacenes/medicamentos/solicitudes + puede usar todo. `Gestor de Solicitudes` = crear solicitud, actualizar estado, consultar historial. Todos autenticados pueden `GET /requests/active` y `GET /requests/clinic/:clinicId`.
+## Autenticación y Rutas (Chain: Auth 401 → Role 403 → Validate 400 → Service 409/404 → Controller 200)
 
-## Validaciones de Negocio
+- `POST /api/v1/auth/register` **sin JWT** — body `name, email, password, role: ADMIN|REQUEST_MANAGER` — `400` si validación, `409` si email duplicado.
+- `POST /api/v1/auth/login` — `200 {accessToken, tokenType:"Bearer"}` payload `{id,email,role,sub,type:"access"}`.
+- `authMiddleware.ts:8` verifica `Bearer`, `role.middleware.ts:14` restringe. **Administrador** = CRUD completo clínicas/almacenes/medicamentos/solicitudes. **Gestor** = `POST /requests` + `PATCH /requests/:id/status` + `GET /requests*`. Todos autenticados `GET /requests/*`. Sin JWT → `401`, rol insuficiente → `403`.
 
-- **NIT duplicado** → `409` en `ClinicService.checkDuplicateNit`.
-- **Cantidad** `quantity <=0` → `400`.
-- **Existencia** clínica/medicamento/almacén → `404` antes de operar.
-- **Inventario** `medicine.stock < quantity` o `medicine.warehouseId != warehouseId` → `409`.
-- **Estados** solo `pending|approved|rejected|delivered|in_transit` → `400` si no permitido. Eliminación lógica vía `status` + `paranoid` (`deleted_at`).
+## Validaciones de Negocio (4 Middlewares dedicados + Zod)
+
+- **NIT duplicado** → `409` `middleware/checkNit.middleware.ts:7` (excluye `id` propio en `PUT`).
+- **Cantidad ≤0** → `400` `middleware/checkQuantity.middleware.ts:7` + `schemas/request.schema.ts:20` `z.coerce.number().min(1)`.
+- **Existencia** clínica/medicamento/almacén → `404` `services/request.service.ts:15` `ensure*Exists`.
+- **Inventario** `stock < qty` o `warehouseId mismatch` → `409` `middleware/checkInventory.middleware.ts:10` (`Medicine.findByPk`).
+- **Estado** solo `PENDING,APPROVED,REJECTED,DISPATCHED,DELIVERED,CANCELLED` (case-insensitive: `approved`→`APPROVED`) → `400` `middleware/checkStatus.middleware.ts:11` + `schemas/request.schema.ts:27` `transform toUpperCase`.
+- Eliminación lógica `paranoid:true` + `isDeleted` + `deleted_at` (no `DELETE FROM`).
 
 ## Endpoints Principales
 
-| Método | Ruta | Auth | Rol |
-|--------|------|------|-----|
-| POST | /api/v1/auth/register | No | — |
-| POST | /api/v1/auth/login | No | — |
-| GET/POST/PUT/DELETE | /api/v1/clinics | Sí | Admin (POST/PUT/DELETE), Auth (GET) |
-| GET/POST/PUT/DELETE | /api/v1/warehouses | Sí | Admin |
-| GET/POST/PUT/DELETE | /api/v1/medicines | Sí | Admin |
-| POST | /api/v1/requests | Sí | Admin, Gestor |
-| PATCH | /api/v1/requests/:id/status | Sí | Admin, Gestor |
-| GET | /api/v1/requests, /active, /clinic/:clinicId, /:id | Sí | Auth |
-| DELETE | /api/v1/requests/:id | Sí | Admin |
-| POST | /api/v1/seed/upload | Sí | Admin |
+| Método              | Ruta                                               | Auth   | Rol                                                         |
+| ------------------- | -------------------------------------------------- | ------ | ----------------------------------------------------------- |
+| POST                | /api/v1/auth/register                              | No     | —                                                           |
+| POST                | /api/v1/auth/login                                 | No     | —                                                           |
+| GET/POST/PUT/DELETE | /api/v1/clinics                                    | Sí     | Admin (POST/PUT/DELETE), Auth (GET)                         |
+| GET/POST/PUT/DELETE | /api/v1/warehouses                                 | Sí     | Admin                                                       |
+| GET/POST/PUT/DELETE | /api/v1/medicines                                  | Sí     | Admin                                                       |
+| POST                | /api/v1/requests                                   | Sí     | Admin, Gestor                                               |
+| PATCH               | /api/v1/requests/:id/status                        | Sí     | Admin, Gestor                                               |
+| GET                 | /api/v1/requests, /active, /clinic/:clinicId, /:id | Sí     | Auth                                                        |
+| DELETE              | /api/v1/requests/:id                               | Sí     | Admin                                                       |
+| POST                | /api/v1/seed/upload                                | **No** | — (carga inicial Multer JSON sin JWT, ver `seed-real.json`) |
 
-Swagger: `http://localhost:3000/api/docs` (JSDoc en `src/routes/*.ts`).
+Swagger: `http://localhost:3000/api/docs` (JSDoc en `src/routes/*.ts`, `src/docs/swagger.ts` con `servers` y `bearerAuth`).
+
+## Backup y Entrega Moodle
+
+```bash
+# Backup incluido: ./backup.sql (123K, pg_dump --clean --if-exists, 4 users, 3 clinics, 2 warehouses, 4 medicines, 1 request)
+docker exec app-db pg_dump -U nodejs -d app_db --no-owner --no-privileges --clean --if-exists > backup.sql
+# Restaurar: docker exec -i app-db psql -U nodejs -d app_db < backup.sql
+
+# Zip sin node_modules (obligatorio)
+zip -r ../RiwiMediCare-Plus.zip . -x "app/node_modules/*" "app/dist/*" "app/coverage/*" ".git/*"
+# Verificar: unzip -l ../RiwiMediCare-Plus.zip | head
+```
+
+Coverage: `npm run test:coverage` → `6 suites, 51 tests, 43% Stmts / 44% Lines` (`jest.config.cjs` `collectCoverageFrom` services/middleware). Cumple `>40%`.
 
 ## Gitflow y Commits
 
