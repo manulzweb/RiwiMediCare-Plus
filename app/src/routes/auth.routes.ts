@@ -14,9 +14,9 @@ const registerLimiter = rateLimit({
 const router = Router();
 
 /**
- * POST /api/auth/login
+ * POST /api/v1/auth/login
  * @swagger
- * /api/auth/login:
+ * /api/v1/auth/login:
  *   post:
  *     summary: Authenticate user and generate JWT with { id, email, role }
  *     tags: [Auth]
@@ -28,20 +28,28 @@ const router = Router();
  *             type: object
  *             required: [email, password]
  *             properties:
- *               email: { type: string, format: email, example: "user@example.com" }
- *               password: { type: string, format: password, example: "Password123!" }
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: Password123!
  *     responses:
  *       200:
  *         description: Authentication successful - Returns JWT with id, email, role
- *       400: { description: Invalid data }
- *       401: { description: Invalid credentials }
+ *       400:
+ *         description: Invalid data
+ *       401:
+ *         description: Invalid credentials
  */
 router.post('/login', login);
 
 /**
- * POST /api/auth/register - No JWT required
+ * POST /api/v1/auth/register - No JWT required
  * @swagger
- * /api/auth/register:
+ * /api/v1/auth/register:
  *   post:
  *     summary: Register new user with role assignment (ADMIN | REQUEST_MANAGER)
  *     description: No JWT required. Validates required fields and email format. Allows role assignment via body.
@@ -54,16 +62,33 @@ router.post('/login', login);
  *             type: object
  *             required: [name, email, password]
  *             properties:
- *               name: { type: string, description: User full name, example: "Ana Garcia" }
- *               email: { type: string, format: email, example: "ana@riwimedicare.com" }
- *               password: { type: string, format: password, example: "Secure123!@" }
- *               confirmPassword: { type: string, example: "Secure123!@" }
- *               role: { type: string, enum: [ADMIN, REQUEST_MANAGER], description: User role, example: "ADMIN" }
- *               status: { type: string, enum: [activo, inactivo], example: "activo" }
+ *               name:
+ *                 type: string
+ *                 description: User full name
+ *                 example: Ana Garcia
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: ana@riwimedicare.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: Secure123!@
+ *               confirmPassword:
+ *                 type: string
+ *                 example: Secure123!@
+ *               role:
+ *                 type: string
+ *                 enum: [ADMIN, REQUEST_MANAGER]
+ *                 description: User role
+ *                 example: ADMIN
  *     responses:
- *       201: { description: User registered successfully }
- *       400: { description: Validation failed }
- *       409: { description: Email already registered }
+ *       201:
+ *         description: User registered successfully
+ *       400:
+ *         description: Validation failed
+ *       409:
+ *         description: Email already registered
  */
 router.post('/register', registerLimiter, register);
 
