@@ -1,7 +1,10 @@
 # RiwiMediCare Plus — Prueba de Desempeño Módulo 5.2 Node.js
 
-**Coder:** [Tu Nombre Completo] — **Clan:** [Tu Clan - Ej: Clan Gates] — **Be a codernnn**
-**Repositorio:** `https://github.com/<tu-usuario>/RiwiMediCare-Plus` (público, ramas `main`/`develop`/`feature/*`, Conventional Commits)
+**Coder:** Manuel Andres Vasquez Mendoza
+
+**Clan:** NODEJS AM 
+
+**Repositorio:** `https://github.com/manulzweb/RiwiMediCare-Plus` (público, ramas `main`/`develop`/`feature/*`, Conventional Commits)
 
 API REST para gestión del ciclo de vida de solicitudes de abastecimiento de medicamentos (Clínicas, Almacenes, Medicamentos, Solicitudes) — distribución de insumos médicos.
 
